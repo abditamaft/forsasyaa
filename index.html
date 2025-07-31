@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Encrypt/Decrypt</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Menggunakan font Orbitron untuk tema futuristik */
+      body {
+        font-family: "Orbitron", sans-serif;
+        background-color: #0a0a1a;
+        color: #fff;
+        overflow: hidden; /* Mencegah scroll saat animasi */
+      }
+
+      /* Efek Neon untuk Teks */
+      .neon-text {
+        color: #fff;
+        text-shadow: 0 0 7px #29d9ff, 0 0 10px #29d9ff, 0 0 21px #29d9ff,
+          0 0 42px #00aaff, 0 0 82px #00aaff, 0 0 92px #00aaff,
+          0 0 102px #00aaff, 0 0 151px #00aaff;
+        animation: flicker 1.5s infinite alternate;
+      }
+
+      /* Animasi kerlip untuk teks neon */
+      @keyframes flicker {
+        0%,
+        18%,
+        22%,
+        25%,
+        53%,
+        57%,
+        100% {
+          text-shadow: 0 0 4px #29d9ff, 0 0 11px #29d9ff, 0 0 19px #29d9ff,
+            0 0 40px #00aaff, 0 0 80px #00aaff, 0 0 90px #00aaff,
+            0 0 100px #00aaff, 0 0 150px #00aaff;
+        }
+        20%,
+        24%,
+        55% {
+          text-shadow: none;
+        }
+      }
+
+      /* Efek Neon untuk Tombol dan Textbox */
+      .neon-box {
+        border: 2px solid #29d9ff;
+        box-shadow: 0 0 10px #29d9ff, inset 0 0 10px #29d9ff;
+        transition: all 0.3s ease-in-out;
+      }
+      .neon-box:focus-within,
+      .neon-box:hover {
+        box-shadow: 0 0 20px #29d9ff, inset 0 0 20px #29d9ff;
+      }
+
+      /* Gaya Tombol Neon */
+      .neon-button {
+        background-color: transparent;
+        border: 2px solid #29d9ff;
+        color: #29d9ff;
+        text-shadow: 0 0 5px #29d9ff;
+        padding: 1rem 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 0 10px #29d9ff;
+      }
+      .neon-button:hover {
+        background-color: #29d9ff;
+        color: #0a0a1a;
+        box-shadow: 0 0 25px #29d9ff;
+        transform: scale(1.05);
+      }
+      .neon-button:active {
+        transform: scale(0.95);
+      }
+
+      /* Animasi untuk elemen saat muncul (pop-up/zoom) */
+      .animate-pop-in {
+        animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+
+      @keyframes popIn {
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* Animasi untuk transisi halaman */
+      .page {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+      .page.hidden {
+        opacity: 0;
+        transform: scale(0.9);
+        pointer-events: none;
+      }
+
+      /* Gaya untuk Textarea */
+      textarea {
+        background-color: rgba(10, 10, 26, 0.8);
+        resize: none;
+      }
+      textarea::placeholder {
+        color: #4a5568;
+      }
+    </style>
+  </head>
+  <body class="flex items-center justify-center min-h-screen">
+    <!-- Halaman Input -->
+    <main id="home-page" class="page">
+      <h1
+        class="text-4xl text-center md:text-6xl font-bold mb-8 neon-text animate-pop-in"
+        style="animation-delay: 0.2s"
+      >
+        MASUKKAN KODE
+      </h1>
+      <div
+        class="w-full max-w-lg mb-8 animate-pop-in"
+        style="animation-delay: 0.4s"
+      >
+        <textarea
+          id="input-text"
+          class="w-full h-48 p-4 rounded-lg neon-box text-lg focus:outline-none"
+          placeholder="Ketik atau tempel teks di sini..."
+        ></textarea>
+      </div>
+      <button
+        id="generate-btn"
+        class="text-2xl font-bold rounded-lg neon-button animate-pop-in"
+        style="animation-delay: 0.6s"
+      >
+        GENERATE
+      </button>
+    </main>
+
+    <!-- Halaman Hasil -->
+    <section id="result-page" class="page hidden">
+      <h1
+        class="text-4xl text-center md:text-6xl font-bold mb-8 neon-text animate-pop-in"
+      >
+        RESULT
+      </h1>
+      <div
+        class="w-full max-w-lg mb-8 animate-pop-in"
+        style="animation-delay: 0.2s"
+      >
+        <textarea
+          id="output-text"
+          class="w-full h-48 p-4 rounded-lg neon-box text-lg focus:outline-none"
+          readonly
+        ></textarea>
+      </div>
+      <button
+        id="back-btn"
+        class="rounded-full neon-button p-4 animate-pop-in"
+        style="animation-delay: 0.4s"
+        aria-label="Kembali"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"
+          />
+        </svg>
+      </button>
+    </section>
+
+    <script>
+      // --- DOM Elements ---
+      const homePage = document.getElementById("home-page");
+      const resultPage = document.getElementById("result-page");
+      const generateBtn = document.getElementById("generate-btn");
+      const backBtn = document.getElementById("back-btn");
+      const inputText = document.getElementById("input-text");
+      const outputText = document.getElementById("output-text");
+
+      // --- Constants for Encryption/Decryption ---
+      const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+      const HEART_CODE = "#004#";
+      const HEART_EMOJI = "❤️";
+
+      // --- Encryption Function ---
+      function encrypt(text) {
+        // First, replace all heart emojis with the special code
+        let processedText = text.replaceAll(HEART_EMOJI, HEART_CODE);
+
+        let result = "";
+        // Then, encrypt the rest of the text
+        for (const char of processedText) {
+          if (char === HEART_CODE) {
+            result += HEART_CODE; // Keep the code as is for now
+            continue;
+          }
+
+          const lowerChar = char.toLowerCase();
+          const index = ALPHABET.indexOf(lowerChar);
+
+          if (index !== -1) {
+            const char1 = ALPHABET[(index + 2) % 26];
+            const num = ALPHABET.indexOf(char1) + 1; // 1-based position
+            const char2 = ALPHABET[(index + 5) % 26];
+            result += `${char1}${num}${char2}`;
+          } else {
+            result += char; // Keep non-alphabetic characters (spaces, etc.)
+          }
+        }
+        // Finally, replace the code back to emoji for display
+        return result.replaceAll(HEART_CODE, HEART_EMOJI);
+      }
+
+      // --- Decryption Function ---
+      function decrypt(text) {
+        // First, replace emojis with a code that won't be misinterpreted by the regex
+        let processedText = text.replaceAll(HEART_EMOJI, ` ${HEART_CODE} `);
+
+        let result = "";
+        // Use regex to find encrypted patterns, the heart code, or other characters
+        const encryptedChunks =
+          processedText.match(/([a-z]\d+[a-z])|(#004#)|(\s|.)/gi) || [];
+
+        for (const chunk of encryptedChunks) {
+          if (chunk.trim() === HEART_CODE) {
+            result += HEART_EMOJI;
+          } else if (/[a-z]\d+[a-z]/i.test(chunk)) {
+            const char1 = chunk[0].toLowerCase();
+            const index1 = ALPHABET.indexOf(char1);
+            if (index1 !== -1) {
+              // Reverse the encryption process: original = char1 - 2
+              const originalIndex = (index1 - 2 + 26) % 26;
+              result += ALPHABET[originalIndex];
+            }
+          } else {
+            // Keep other characters as they are
+            result += chunk;
+          }
+        }
+        return result;
+      }
+
+      // --- Function to Reset Animations ---
+      function resetAnimations(page) {
+        page.querySelectorAll(".animate-pop-in").forEach((el) => {
+          el.style.animation = "none";
+          el.offsetHeight; /* Trigger reflow to reset */
+          el.style.animation = null;
+        });
+      }
+
+      // --- Event Listeners ---
+      generateBtn.addEventListener("click", () => {
+        const input = inputText.value;
+        if (!input.trim()) return; // Do nothing if input is empty
+
+        let output = "";
+        // Heuristic: if input contains an encrypted pattern, decrypt. Otherwise, encrypt.
+        // The heart emoji is handled by both functions, so it's not a reliable indicator alone.
+        if (/[a-z]\d+[a-z]/i.test(input)) {
+          output = decrypt(input);
+        } else {
+          output = encrypt(input);
+        }
+
+        outputText.value = output;
+
+        // Page transition
+        homePage.classList.add("hidden");
+        resultPage.classList.remove("hidden");
+        resetAnimations(resultPage);
+      });
+
+      backBtn.addEventListener("click", () => {
+        // Transition back to the main page
+        resultPage.classList.add("hidden");
+        homePage.classList.remove("hidden");
+        inputText.value = ""; // Clear input for a new session
+        outputText.value = "";
+        resetAnimations(homePage);
+      });
+    </script>
+  </body>
+</html>
